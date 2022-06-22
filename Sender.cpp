@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Введите цифру в соответствии с желаемым действием:\n"
                      "0 - Завершить работу.\n"
                      "1 - Отправить сообщение.\n";
-        byte action;
+        short action;
         std::cin >> action;
         if (action == 0) terminate = true;
         else if (action == 1) {
