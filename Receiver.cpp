@@ -61,9 +61,9 @@ int main() {
         std::cin >> action;
         if (action == 0) terminate = true;
         else if (action == 1) {
-            std::string messageString;
-            commFile.read((char *) &messageString, sizeof(std::string));
-            std::cout << "Запрошенное сообщение:\n" << messageString << "\n";
+            char message[20];
+            commFile.read(message, 20);
+            std::cout << "Запрошенное сообщение:\n" << message << "\n";
         } else std::cout << "Введен неверный код действия.\n";
     }
 

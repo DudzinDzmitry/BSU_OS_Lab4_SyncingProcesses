@@ -21,9 +21,9 @@ int main(int argc, char* argv[]) {
         if (action == 0) terminate = true;
         else if (action == 1) {
             std::cout << "Введите сообщение:\n";
-            std::string messageString;
+            char messageString[20];
             std::cin >> messageString;
-            commFile.write((char *) &messageString, sizeof(std::string));
+            commFile.write(messageString, 20);
         } else std::cout << "Введен неверный код действия.\n";
     }
 
