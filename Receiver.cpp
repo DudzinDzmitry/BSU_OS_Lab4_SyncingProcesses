@@ -21,6 +21,7 @@ bool startProcess(const char *appName, const char *cmdLine) {
 }
 
 int main() {
+    SetConsoleOutputCP(CP_UTF8);
     std::cout << "Данная программа позволяет запись и чтение сообщений в/из бинарного файла различными потоками.\n";
 
     std::cout << "Введите имя бинарного файла, который будет использоваться потоками для обмена сообщениями:\n";
@@ -38,8 +39,9 @@ int main() {
     int processCount;
     std::cin >> processCount;
 
-    HANDLE senderReadySemaphore = CreateSemaphore(NULL, -processCount, 0, "Ready");
+    HANDLE messageSentEvent = CreateEvent(NULL, TRUE, FALSE, "MessageSent");
 
+    HANDLE senderReadySemaphore = CreateSemaphore(NULL, -processCount, 0, "Ready");
     WaitForSingleObject(senderReadySemaphore, INFINITE);
 
     int i = 0;
@@ -50,5 +52,23 @@ int main() {
 
     WaitForSingleObject(senderReadySemaphore, INFINITE);
 
+    bool terminate = false;
+    while (!terminate) {
+        std::cout << "Введите цифру в соответствии с желаемым действием:\n"
+                     "0 - Завершить работу.\n"
+                     "1 - Прочитать сообщение.\n";
+        byte action;
+        std::cin >> action;
+        if (action == 0) terminate = true;
+        else if (action == 1) {
+            std::string messageString;
+            commFile.read((char *) &messageString, sizeof(std::string));
+            std::cout << "Запрошенное сообщение:\n" << messageString << "\n";
+        } else std::cout << "Введен неверный код действия.\n";
+    }
+
+    commFile.close();
+
+    system("pause");
     return 0;
 }
