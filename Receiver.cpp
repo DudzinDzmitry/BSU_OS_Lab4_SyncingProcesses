@@ -29,7 +29,7 @@ int main() {
     std::cin >> commFileName;
 
     std::cout
-            << "Введите количество записей в бинарном файле, который будет использоваться потоками для обмена сообщениями:";
+            << "Введите максимальное количество записей в бинарном файле, который будет использоваться потоками для обмена сообщениями:";
     int recordCount;
     std::cin >> recordCount;
 
@@ -40,6 +40,7 @@ int main() {
     std::cin >> processCount;
 
     HANDLE messageSentEvent = CreateEvent(NULL, TRUE, FALSE, "MessageSent");
+    HANDLE unreadMessagesSemaphore = CreateSemaphore(NULL, recordCount, recordCount, "UnreadMsg");
 
     HANDLE senderReadySemaphore = CreateSemaphore(NULL, -processCount, 0, "Ready");
     WaitForSingleObject(senderReadySemaphore, INFINITE);
@@ -61,9 +62,15 @@ int main() {
         std::cin >> action;
         if (action == 0) terminate = true;
         else if (action == 1) {
-            char message[20];
-            commFile.read(message, 20);
-            std::cout << "Запрошенное сообщение:\n" << message << "\n";
+            if (commFile.eof()) {
+                std::cout << "В файле нет сообщений. Receiver переходит в режим ожидания сообщений...\n";
+                WaitForSingleObject(messageSentEvent, INFINITE);
+            } else {
+                char message[20];
+                commFile.read(message, 20);
+                std::cout << "Запрошенное сообщение:\n" << message << "\n";
+                ReleaseSemaphore(unreadMessagesSemaphore, 1, NULL);
+            }
         } else std::cout << "Введен неверный код действия.\n";
     }
 
